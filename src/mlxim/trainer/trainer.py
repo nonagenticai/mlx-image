@@ -168,7 +168,7 @@ class Trainer:
                 "> "
                 + " | ".join(
                     [
-                        f"epoch_time={toc-tic:.2f}s",
+                        f"epoch_time={toc - tic:.2f}s",
                         f"train_loss={train_loss:.3f}",
                         f"train_throughput={train_throughput:.2f} images/second",
                     ]

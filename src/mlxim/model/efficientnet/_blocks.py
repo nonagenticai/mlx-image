@@ -1,4 +1,5 @@
 """MBConv blocks for EfficientNet."""
+
 import math
 from dataclasses import dataclass
 from typing import Callable, Optional
@@ -24,6 +25,7 @@ class MBConvConfig:
         width_mult (float): Width multiplier for channels
         depth_mult (float): Depth multiplier for number of layers
     """
+
     expand_ratio: float
     kernel: int
     stride: int

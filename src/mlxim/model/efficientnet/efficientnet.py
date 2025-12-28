@@ -1,4 +1,5 @@
 """EfficientNet model implementation in MLX."""
+
 import copy
 from pathlib import Path
 from typing import List, Optional, Union

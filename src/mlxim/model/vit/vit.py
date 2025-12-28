@@ -36,8 +36,7 @@ class Attention(nn.Module):
 
         if (dims % num_heads) != 0:
             raise ValueError(
-                "The input feature dimensions should be divisible by the "
-                f"number of heads ({dims} % {num_heads}) != 0"
+                f"The input feature dimensions should be divisible by the number of heads ({dims} % {num_heads}) != 0"
             )
 
         query_input_dims = query_input_dims or dims

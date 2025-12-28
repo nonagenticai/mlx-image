@@ -4,6 +4,7 @@ Based on the paper: Searching for MobileNetV3 (https://arxiv.org/abs/1905.02244)
 
 Original implementation: torchvision (https://github.com/pytorch/vision)
 """
+
 from typing import Callable, List, Optional
 
 import mlx.core as mx
@@ -280,8 +281,7 @@ def _mobilenet_v3_conf(
         dilation: int,
     ):
         return InvertedResidualConfig(
-            input_channels, kernel, expanded_channels, out_channels,
-            use_se, activation, stride, dilation, width_mult
+            input_channels, kernel, expanded_channels, out_channels, use_se, activation, stride, dilation, width_mult
         )
 
     def adjust_channels(channels: int):

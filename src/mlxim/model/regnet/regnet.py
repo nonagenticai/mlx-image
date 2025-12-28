@@ -79,7 +79,6 @@ class BottleneckTransform(nn.Module):
         )
 
     def __call__(self, x: mx.array) -> mx.array:
-
         x = self.a(x)
 
         x = self.b(x)
