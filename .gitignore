@@ -171,3 +171,6 @@ test_*.py
 .idea/
 .vscode/
 *.code-workspace
+.local-ci-commit.txt
+.gitignore
+.gitignore
