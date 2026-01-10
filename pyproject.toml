@@ -170,6 +170,9 @@ exclude = '''
 )/
 '''
 
+[tool.local-ci]
+skip_tests = true  # Requires Apple Silicon (MLX) - tests run manually on mini1/mini2
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 log_file = "tests/logs/pytest-logs.log"
