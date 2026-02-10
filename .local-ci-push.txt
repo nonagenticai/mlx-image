@@ -1,0 +1,38 @@
+═══════════════════════════════════════════════════════════════
+LOCAL CI - PUSH MODE (guarded tests)
+Repo: mlx-image
+Time: 2026-02-10 21:39:53
+═══════════════════════════════════════════════════════════════
+
+Pushing: refs/heads/main -> refs/heads/main
+
+───────────────────────────────────────────────────────────────
+[RUFF LINT]
+───────────────────────────────────────────────────────────────
+Running: uv run ruff check .
+warning: No `requires-python` value found in the workspace. Defaulting to `>=3.13`.
+All checks passed!
+✅ Ruff lint passed
+
+───────────────────────────────────────────────────────────────
+[RUFF FORMAT CHECK]
+───────────────────────────────────────────────────────────────
+Running: uv run ruff format --check .
+warning: No `requires-python` value found in the workspace. Defaulting to `>=3.13`.
+61 files already formatted
+✅ Format check passed
+
+───────────────────────────────────────────────────────────────
+[TY (blocking)]
+───────────────────────────────────────────────────────────────
+⏭️  [tool.local-ci] skip_ty = true - skipping ty (external repo)
+
+───────────────────────────────────────────────────────────────
+[PYTEST (unit tests with timeout)]
+───────────────────────────────────────────────────────────────
+⏭️  [tool.local-ci] skip_tests = true - skipping tests (hardware-specific)
+
+═══════════════════════════════════════════════════════════════
+✅ PUSH ALLOWED
+
+Log saved to: .local-ci-push.txt
