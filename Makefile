@@ -26,12 +26,12 @@ clean:
 check:
 	ruff check --diff .
 	black --check --diff .
-	mypy .
+	ty check .
 
 format:
 	ruff check --show-fixes .
 	black .
-	mypy .
+	ty check .
 
 test:
 	pytest tests/
