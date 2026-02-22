@@ -172,5 +172,4 @@ test_*.py
 .vscode/
 *.code-workspace
 .local-ci-commit.txt
-.gitignore
-.gitignore
+.local-ci-push.txt
