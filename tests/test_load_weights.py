@@ -101,9 +101,9 @@ class TestLoadWeightsTransposition:
         loaded = get_weights(model2)
 
         # After auto-transpose, values should match original MLX weights
-        assert mx.allclose(loaded[conv_key], original_mlx, atol=1e-6).item(), (
-            "Transposed weight values don't match original"
-        )
+        assert mx.allclose(
+            loaded[conv_key], original_mlx, atol=1e-6
+        ).item(), "Transposed weight values don't match original"
 
     def test_untransposable_4d_stays_random(self, tmp_path):
         """4D weights that can't be fixed by transposition should keep model init."""

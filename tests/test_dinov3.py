@@ -158,9 +158,9 @@ class TestDinov3Pretrained:
         # All 4 images should produce different features
         for i in range(4):
             for j in range(i + 1, 4):
-                assert not np.allclose(features[i], features[j], atol=1e-4), (
-                    f"Features for image {i} and {j} are too similar"
-                )
+                assert not np.allclose(
+                    features[i], features[j], atol=1e-4
+                ), f"Features for image {i} and {j} are too similar"
 
     @pytest.mark.parametrize("model_name", DINOV3_MODELS)
     def test_same_class_more_similar(self, model_name, real_batch):
@@ -173,9 +173,9 @@ class TestDinov3Pretrained:
 
         sim_cross = cosine(features[0], features[1])  # tench vs cock
         sim_same = cosine(features[2], features[3])  # turtle vs turtle
-        assert sim_same > sim_cross, (
-            f"Same-class similarity ({sim_same:.4f}) should exceed cross-class ({sim_cross:.4f})"
-        )
+        assert (
+            sim_same > sim_cross
+        ), f"Same-class similarity ({sim_same:.4f}) should exceed cross-class ({sim_cross:.4f})"
 
     @pytest.mark.parametrize("model_name", DINOV3_MODELS)
     def test_deterministic_inference(self, model_name, real_images):
