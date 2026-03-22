@@ -230,7 +230,7 @@ class BlockParams:
         bottleneck_multiplier: float = 1.0,
         se_ratio: float | None = None,
         **kwargs: Any,
-    ) -> "BlockParams":
+    ) -> BlockParams:
         """
         Programatically compute all the per-block settings,
         given the RegNet parameters.
