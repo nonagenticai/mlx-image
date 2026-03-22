@@ -3,7 +3,7 @@ name = "mlx-image"
 version = "0.1.10"
 description = "Apple MLX image models library"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 authors = [
     { name = "Riccardo Musmeci", email = "riccardomusmeci92@gmail.com" },
 ]
@@ -45,7 +45,7 @@ packages = ["src/mlxim"]
 src = ["src"]
 line-length = 120
 fix = true
-target-version = "py313"
+target-version = "py314"
 
 exclude = [
     ".bzr", ".direnv", ".eggs", ".git", ".hg", ".nox", ".pants.d",
