@@ -1,4 +1,5 @@
 import math
+from collections.abc import Callable
 
 import mlx.core as mx
 import mlx.nn as nn
@@ -15,7 +16,7 @@ class PatchEmbed(nn.Module):
         patch_size: int | tuple[int, int] = 16,
         in_chans: int = 3,
         embed_dim: int = 768,
-        norm_layer: type[nn.Module] | None = None,
+        norm_layer: Callable[[int], nn.Module] | None = None,
         flatten_embedding: bool = True,
     ) -> None:
         super().__init__()

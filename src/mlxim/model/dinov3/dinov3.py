@@ -367,7 +367,7 @@ class DinoVisionTransformer(nn.Module):
 
     def forward_features_list(
         self, x_list: list[mx.array], masks_list: list[mx.array | None]
-    ) -> list[dict[str, mx.array]]:
+    ) -> list[dict[str, mx.array | None]]:
         x = []
         rope = []
         for t_x, t_masks in zip(x_list, masks_list):
@@ -381,7 +381,7 @@ class DinoVisionTransformer(nn.Module):
                 rope_sincos = [None for _r in rope]
             x = blk(x, rope_sincos)
 
-        output: list[dict[str, mx.array]] = []
+        output: list[dict[str, mx.array | None]] = []
         for idx, (x_val, masks) in enumerate(zip(x, masks_list)):
             if self.untie_cls_and_patch_norms or self.untie_global_and_local_cls_norm:
                 if (
@@ -415,7 +415,7 @@ class DinoVisionTransformer(nn.Module):
         self,
         x: mx.array | list[mx.array],
         masks: mx.array | list[mx.array | None] | None = None,
-    ) -> dict[str, mx.array] | list[dict[str, mx.array]]:
+    ) -> dict[str, mx.array | None] | list[dict[str, mx.array | None]]:
         if isinstance(x, mx.array):
             masks_list: list[mx.array | None] = [masks if isinstance(masks, mx.array) else None]
             return self.forward_features_list([x], masks_list)[0]
@@ -481,13 +481,17 @@ class DinoVisionTransformer(nn.Module):
         """Get CLS token features."""
         ret = self.forward_features(x)
         assert isinstance(ret, dict)
-        return ret["x_norm_clstoken"]
+        cls_token = ret["x_norm_clstoken"]
+        assert isinstance(cls_token, mx.array)
+        return cls_token
 
     def __call__(
         self, x: mx.array, is_training: bool = False, **kwargs
-    ) -> dict[str, mx.array] | list[dict[str, mx.array]] | mx.array:
+    ) -> dict[str, mx.array | None] | list[dict[str, mx.array | None]] | mx.array:
         ret = self.forward_features(x, **kwargs)
         if is_training:
             return ret
         assert isinstance(ret, dict)
-        return self.head(ret["x_norm_clstoken"])
+        cls_token = ret["x_norm_clstoken"]
+        assert isinstance(cls_token, mx.array)
+        return self.head(cls_token)
