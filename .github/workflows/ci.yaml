@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-security:
+    runs-on: [self-hosted, linux, amd64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.14"
+          enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Ruff lint
+        run: uv run ruff check src/ tests/
+
+      - name: Ruff format check
+        run: uv run ruff format --check src/ tests/
+
+      - name: Install security tools
+        run: uv pip install bandit pip-audit
+
+      - name: Bandit security scan
+        # External repo: High severity + High confidence only (upstream has 1 medium B615
+        # huggingface_unsafe_download we don't want to patch in fork)
+        run: uv run bandit -r src/ -lll -iii
+
+      - name: pip-audit
+        run: uv run pip-audit --skip-editable --ignore-vuln CVE-2026-3219
