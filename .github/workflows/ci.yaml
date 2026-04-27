@@ -1,3 +1,6 @@
+# Public fork — runs on GitHub-hosted ubuntu-latest because the
+# nonagenticai org self-hosted runner groups have allows_public_repositories=false
+# (correct security posture), so jobs from forks queue forever on self-hosted labels.
 name: CI
 
 on:
@@ -13,7 +16,7 @@ concurrency:
 
 jobs:
   lint-and-security:
-    runs-on: [self-hosted, linux, amd64]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
