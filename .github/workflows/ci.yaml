@@ -41,4 +41,4 @@ jobs:
         run: uv run bandit -r src/ -lll -iii
 
       - name: pip-audit
-        run: uv run pip-audit --skip-editable --ignore-vuln CVE-2026-3219
+        run: uv run pip-audit --skip-editable
