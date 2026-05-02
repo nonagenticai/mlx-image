@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   lint-and-security:
-    runs-on: [self-hosted, macOS, ARM64, mlx]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
