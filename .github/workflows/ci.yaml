@@ -42,9 +42,10 @@ jobs:
         run: uv pip install bandit pip-audit
 
       - name: Bandit security scan
-        # External repo: High severity + High confidence only (upstream has 1 medium B615
-        # huggingface_unsafe_download we don't want to patch in fork)
-        run: uv run bandit -r src/ -lll -iii
+        # The previously-tolerated B615 huggingface_unsafe_download was
+        # patched in our fork (commit faf5f30). Tightened from `-lll -iii`
+        # to `-ll -ii` so any newly introduced Medium+ finding fails CI.
+        run: uv run bandit -r src/ -ll -ii
 
       - name: pip-audit
         run: uv run pip-audit --skip-editable
