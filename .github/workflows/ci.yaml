@@ -47,5 +47,6 @@ jobs:
         # to `-ll -ii` so any newly introduced Medium+ finding fails CI.
         run: uv run bandit -r src/ -ll -ii
 
-      - name: pip-audit
-        run: uv run pip-audit --skip-editable
+      - name: Security scan - pip-audit
+        run: scripts/pip-audit.sh
+
