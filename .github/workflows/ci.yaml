@@ -61,7 +61,16 @@ jobs:
     #
     # Separate job, not a step on lint-and-security: a lint failure must not
     # hide a broken model, and vice versa.
-    runs-on: ubuntu-latest
+    #
+    # ⛔ macos-latest, NOT ubuntu-latest. MLX is Metal-only: the `mlx` wheel
+    # installs happily on Linux and then dies at import with
+    # `ImportError: libmlx.so: cannot open shared object file`, so the whole
+    # suite errors at conftest before collecting anything (exit 4). Measured on
+    # this very PR's first run. GitHub-hosted macos runners are arm64 and are
+    # free for public repos; the org's self-hosted mac pool is NOT usable here
+    # because its runner groups set allows_public_repositories=false (see the
+    # header of this file), so a fork's jobs queue on those labels forever.
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
 
