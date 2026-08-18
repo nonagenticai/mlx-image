@@ -65,11 +65,12 @@ class Attention(nn.Module):
         checkpoints that already have fused qkv_proj.
         """
         import re
+
         sanitized = {}
         qkv_groups = {}
 
         for k, v in weights.items():
-            m = re.match(r'(.*)\.self_attention\.(query|key|value)_proj\.(weight|bias)', k)
+            m = re.match(r"(.*)\.self_attention\.(query|key|value)_proj\.(weight|bias)", k)
             if m:
                 prefix, qkv, wb = m.groups()
                 full_prefix = f"{prefix}.self_attention"
@@ -81,14 +82,10 @@ class Attention(nn.Module):
 
         for prefix, parts in qkv_groups.items():
             if "query_weight" in parts:
-                fused_w = mx.concatenate(
-                    [parts["query_weight"], parts["key_weight"], parts["value_weight"]], axis=0
-                )
+                fused_w = mx.concatenate([parts["query_weight"], parts["key_weight"], parts["value_weight"]], axis=0)
                 sanitized[f"{prefix}.qkv_proj.weight"] = fused_w
             if "query_bias" in parts:
-                fused_b = mx.concatenate(
-                    [parts["query_bias"], parts["key_bias"], parts["value_bias"]], axis=0
-                )
+                fused_b = mx.concatenate([parts["query_bias"], parts["key_bias"], parts["value_bias"]], axis=0)
                 sanitized[f"{prefix}.qkv_proj.bias"] = fused_b
 
         return sanitized
@@ -529,6 +526,24 @@ class VisionTransformer(nn.Module):
             return x, attn
         else:
             return x
+
+    @staticmethod
+    def sanitize(weights):
+        """Delegate to Attention.sanitize so published checkpoints still load.
+
+        Upstream fused Q/K/V into a single `qkv_proj` matmul and added
+        `Attention.sanitize` to convert older checkpoints -- but nothing ever
+        called it. `load_weights` compares checkpoint keys against model
+        params, so every published checkpoint (which still carries separate
+        query_proj/key_proj/value_proj) failed with "Found extra keys in
+        weights file" under strict=True. Caught by tests/test_models.py
+        ::test_download_vit, which passes on the pre-merge tree and fails
+        after it.
+
+        Exposed on the top-level model because that is where `load_weights`
+        can find it -- the fusing logic itself stays on Attention.
+        """
+        return Attention.sanitize(weights)
 
 
 class DINOHead(nn.Module):

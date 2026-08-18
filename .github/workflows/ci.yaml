@@ -50,3 +50,44 @@ jobs:
       - name: Security scan - pip-audit
         run: scripts/pip-audit.sh
 
+  test:
+    # ADDED 2026-08-18. This repo has 244 tests and CI ran NONE of them --
+    # `lint-and-security` was the only job. That gap is not theoretical: the
+    # upstream merge in this same PR fused Q/K/V into a single `qkv_proj` and
+    # shipped an `Attention.sanitize` to convert older checkpoints that nothing
+    # ever called, so every published ViT checkpoint failed strict loading.
+    # Lint, format, bandit and pip-audit were all green on that regression.
+    # tests/test_models.py::test_download_vit caught it in under a second.
+    #
+    # Separate job, not a step on lint-and-security: a lint failure must not
+    # hide a broken model, and vice versa.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.14"
+          enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Pytest
+        # -p no:randomly keeps ordering stable; some model tests download
+        # weights from the HF Hub and are order-sensitive on cache warmth.
+        run: uv run pytest tests/ -q --no-header
+
+      - name: Assert the suite is not vacuous
+        # A suite that collects 0 tests exits 5, and an `|| true` anywhere
+        # upstream would read as green. Pin the floor to what exists today so
+        # a collection error cannot masquerade as a pass.
+        run: |
+          set -euo pipefail
+          n=$(uv run pytest tests/ -q --collect-only 2>/dev/null | tail -1 | grep -oE '^[0-9]+' || echo 0)
+          echo "collected ${n} tests"
+          if [ "${n:-0}" -lt 200 ]; then
+            echo "::error::expected >=200 tests, collected ${n}. A shrinking suite is a silent loss of coverage."
+            exit 1
+          fi

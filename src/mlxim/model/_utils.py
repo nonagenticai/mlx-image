@@ -63,6 +63,15 @@ def load_weights(model: nn.Module, weights: str, strict: bool = True, verbose: b
     loaded = mx.load(weights)
     assert isinstance(loaded, dict), f"Expected dict from mx.load, got {type(loaded)}"
     pretrained_weights: dict[str, mx.array] = {str(k): v for k, v in loaded.items() if isinstance(v, mx.array)}
+    # Let the model remap checkpoint keys BEFORE any key comparison. MLX's
+    # convention is a `sanitize` hook; ViT uses it to fuse separate
+    # query/key/value projections into the fused `qkv_proj` introduced
+    # upstream. Without this the hook was dead code and every published ViT
+    # checkpoint failed strict loading with "Found extra keys in weights file".
+    sanitize = getattr(model, "sanitize", None)
+    if callable(sanitize):
+        pretrained_weights = sanitize(pretrained_weights)
+
     # create a torch-like state dict { layer_name: weights }
     model_weights = dict(tree_flatten(model.parameters()))
     # check if pretrained_weights does not have more keys
