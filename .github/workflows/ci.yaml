@@ -86,7 +86,11 @@ jobs:
       - name: Pytest
         # -p no:randomly keeps ordering stable; some model tests download
         # weights from the HF Hub and are order-sensitive on cache warmth.
-        run: uv run pytest tests/ -q --no-header
+        # Single run, teed -- the floor below reads THIS result instead of
+        # invoking pytest a second time.
+        run: |
+          set -euo pipefail
+          uv run pytest tests/ -q --no-header | tee /tmp/pytest-out.txt
 
       - name: Assert the suite is not vacuous
         # A suite that collects 0 tests exits 5, and an `|| true` anywhere
@@ -94,9 +98,13 @@ jobs:
         # a collection error cannot masquerade as a pass.
         run: |
           set -euo pipefail
-          n=$(uv run pytest tests/ -q --collect-only 2>/dev/null | tail -1 | grep -oE '^[0-9]+' || echo 0)
-          echo "collected ${n} tests"
+          # Parse "N passed" from the real run. The previous version grepped
+          # `^[0-9]+` against the last line of --collect-only, but that line is
+          # `===== 200 tests collected in 0.3s =====` -- the count is NOT at the
+          # start, so it always extracted nothing and reported 0.
+          n=$(grep -oE '[0-9]+ passed' /tmp/pytest-out.txt | grep -oE '^[0-9]+' | tail -1 || echo 0)
+          echo "passed ${n} tests"
           if [ "${n:-0}" -lt 200 ]; then
-            echo "::error::expected >=200 tests, collected ${n}. A shrinking suite is a silent loss of coverage."
+            echo "::error::expected >=200 passing tests, saw ${n}. A shrinking suite is a silent loss of coverage."
             exit 1
           fi
